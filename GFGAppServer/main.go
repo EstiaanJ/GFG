@@ -177,6 +177,7 @@ func (e *Env) transfer(c *gin.Context) {
 		println("Error inserting transaction into database: " + err.Error())
 		return
 	}
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.IndentedJSON(http.StatusOK, transfer)
 }
 
