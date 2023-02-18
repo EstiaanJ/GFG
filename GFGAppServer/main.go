@@ -37,9 +37,13 @@ func main() {
 	router.POST("/accounts", postAccount)
 	router.POST("/api/login", login)
 
-	//config := cors.DefaultConfig()
-	//config.AllowOrigins = []string{"http://"}
 	router.Use(cors.Default())
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://51.161.163.66:44658"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Origin"},
+	}))
 
 	router.Run("51.161.163.66:44658")
 }
