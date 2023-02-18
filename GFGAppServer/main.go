@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
@@ -35,6 +36,10 @@ func main() {
 	router.POST("/transfer", env.transfer)
 	router.POST("/accounts", postAccount)
 	router.POST("/api/login", login)
+
+	//config := cors.DefaultConfig()
+	//config.AllowOrigins = []string{"http://"}
+	router.Use(cors.Default())
 
 	router.Run("51.161.163.66:44658")
 }
