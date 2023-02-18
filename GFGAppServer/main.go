@@ -114,6 +114,8 @@ func (e *Env) accountUserEndpoint(c *gin.Context) {
 	account.Balance = balance
 
 	// Return the account information as JSON
+	//Add Access-Control-Allow-Origin header to the response
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.IndentedJSON(http.StatusOK, account)
 }
 
