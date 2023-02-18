@@ -36,7 +36,7 @@ func main() {
 	router.POST("/accounts", postAccount)
 	router.POST("/api/login", login)
 
-	router.Run("localhost:8384")
+	router.Run("51.161.163.66:44658")
 }
 
 func indexHandler(db *sql.DB) {

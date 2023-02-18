@@ -8,7 +8,7 @@ $(document).ready(function() {
     // Make AJAX request to server
     $.ajax({
       type: "POST",
-      url: "http://localhost:8384" + hash,
+      url: "http://51.161.163.66:44658" + hash,
       dataType: "json",
       data: JSON.stringify({username: username}), // Send only username in JSON object
       success: function(data) {

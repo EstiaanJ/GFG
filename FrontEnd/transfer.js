@@ -9,7 +9,7 @@ function transfer() {
     
     // Make a POST request to the /transfer endpoint with the from_acc_username and amount values
     $.ajax({
-      url: "http://localhost:8384/transfer",
+      url: "http://51.161.163.66:44658/transfer",
       type: "POST",
       dataType: "json",
       data: JSON.stringify({from_acc_name:from_acc_name,to_acc_username:to_acc_username, amount: amount }),
