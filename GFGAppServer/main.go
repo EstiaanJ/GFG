@@ -166,6 +166,11 @@ func (e *Env) transfer(c *gin.Context) {
 		println("Insufficient funds")
 		return
 	}
+	if amountFloat < 0 {
+		println("Cannot transfer negative amount")
+		return
+	}
+
 	println("balance: " + strconv.FormatFloat(balance, 'f', 2, 64))
 	//add transaction to database
 	//convert from_account_id and to_account_id to string
