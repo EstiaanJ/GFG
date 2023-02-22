@@ -25,14 +25,40 @@ func main() {
 
 	indexHandler(db)
 
+	//Get all users from the database for the endpoints
+	rows, err := db.Query("SELECT username, pass_hash FROM users")
+	defer rows.Close()
+	if err != nil {
+		println("Error querying database:" + err.Error())
+	}
+
+	var users []User
+	for rows.Next() {
+		var user User
+		err = rows.Scan(&user.Name, &user.passHash)
+		if err != nil {
+			println("Error scanning row: " + err.Error())
+			continue
+		}
+		user.endpoint = "/account/" + user.Name + "/" + user.passHash
+		users = append(users, user)
+		//print user passHash
+		println("passHash: " + user.passHash)
+	}
+
 	router := gin.Default()
 
 	router.GET("/accounts", getAccounts)
-	// get all users from the database
 
+	//Print number of users
+	println("Number of users: " + strconv.Itoa(len(users)))
 	// loop through users and create endpoints for each user
 	for _, user := range users {
+
+		//Print the endpoint
+		println("Endpoint: " + user.endpoint)
 		router.POST(user.endpoint, env.accountUserEndpoint)
+
 	}
 
 	router.POST("/transfer", env.transfer)
