@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/accounts", getAccounts)
+	// get all users from the database
 
 	// loop through users and create endpoints for each user
 	for _, user := range users {
@@ -177,7 +179,7 @@ func (e *Env) transfer(c *gin.Context) {
 	transfer_id := uuid.New()
 	from_account_id_str := strconv.Itoa(from_account_id)
 	to_account_id_str := strconv.Itoa(to_account_id)
-	_, err = e.db.Exec("INSERT INTO transactions (trans_id, amount, from_account_id, to_account_id) VALUES ($1, $2, $3, $4)", transfer_id, transfer.Amount, from_account_id_str, to_account_id_str)
+	_, err = e.db.Exec("INSERT INTO transactions (trans_id, amount, from_account_id, to_account_id, date) VALUES ($1, $2, $3, $4, $5)", transfer_id, transfer.Amount, from_account_id_str, to_account_id_str, time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		println("Error inserting transaction into database: " + err.Error())
 		return
@@ -256,11 +258,3 @@ type Transfer struct {
 }
 
 // RAM stuff -----------------------------------------
-
-var users = []User{
-	{Name: "Yaqoob", passHash: "c1a20a4f708bd9406f0072d50e3cf4958a11b3d13f9001a585e05ca058f10373", endpoint: "/account/Yaqoob/c1a20a4f708bd9406f0072d50e3cf4958a11b3d13f9001a585e05ca058f10373"},
-	{Name: "Kyle", passHash: "2cd01faa99669fe375ef010560ccc13f9604126b8473562533c686d4a5286898", endpoint: "/account/Kyle/2cd01faa99669fe375ef010560ccc13f9604126b8473562533c686d4a5286898"},
-	{Name: "Jye", passHash: "44108689ee9588e0d6623ff2c1b71009c63083e674c4a2eed432561655563606", endpoint: "/account/Jye/44108689ee9588e0d6623ff2c1b71009c63083e674c4a2eed432561655563606"},
-	{Name: "Almo", passHash: "965d9f902a5f3fcbfaf1c3849842fb389b1f488d48ba769bcbc413a5d4ec4919", endpoint: "/account/Almo/965d9f902a5f3fcbfaf1c3849842fb389b1f488d48ba769bcbc413a5d4ec4919"},
-	{Name: "Admin", passHash: "1727b577ad38f5a483a7c3741d46a4f7ab450c0a8553eb1c1db6293fea3c7b97", endpoint: "/account/Almo/1727b577ad38f5a483a7c3741d46a4f7ab450c0a8553eb1c1db6293fea3c7b97"},
-}

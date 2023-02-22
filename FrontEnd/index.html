@@ -2,21 +2,36 @@
 <html>
 <head>
   <title>Login Form</title>
-  <link rel="stylesheet" href="styles.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
 <script src="login.js"></script>
 
 </head>
 <body>
-  <h1>Login Form</h1>
-  <form name="user_form">
-    <label for="username">Username:</label>
+  <div style="margin: auto; width: 50%; padding: 10px;">
+    <h1>Login Form</h1>
+  <form name="user_form" >
+
+    <label  for="username">Username:</label>
     <input type="text" id="username" name="username" required><br><br>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required><br><br>
     <input type="button" value="Login" onclick="return createEndPoint()">
   </form>
+  </div>
 </body>
 </html>

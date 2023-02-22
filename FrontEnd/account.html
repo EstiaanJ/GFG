@@ -5,10 +5,23 @@
         <link rel="stylesheet" type="text/css" href="styles.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery CDN link -->
         <script src="transfer.js"></script>
+
+          <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
       </head>
   <body>
     <div class="container">
-      <h1>My Bank Account</h1>
+      <h1>GFG Bank Account</h1>
       <div class="account-summary">
         <h2>Account Summary</h2>
         <p>Username: <span id="username"></span></p>
@@ -26,7 +39,7 @@
           </tr>
         </table>
       </div>
-      <form name="transfer_form">
+      <form name="transfer_form" style="padding: 15px;">
         <label for="to_acc_username">Transfer To:</label>
         <input type="text" id="to_acc_username" name="to_acc_username" required><br><br>
         <label for="amount">Amount:</label>
