@@ -14,25 +14,23 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const db_str_production = "postgresql://postgres:uv7MEyHry3q8v4yQFvpTNV5vgMBL5@51.161.163.66:48338/GFG_Prime?sslmode=disable"
-const db_str_test = "postgresql://postgres:uv7MEyHry3q8v4yQFvpTNV5vgMBL5@51.161.163.66:48338/GFG_Test?sslmode=disable"
+//The Postgres URI and password that is leaked in the version history here has been changed
 
 func main() {
 	argsWithoutProg := os.Args[1:]
 
-	ip := argsWithoutProg[0]
-	port := argsWithoutProg[1]
-	ipAndPort := ip + ":" + port
-	test := argsWithoutProg[2] == "test"
-	db_str := db_str_production
-	if test {
-		db_str = db_str_test
-		println("Launching in test mod")
-	}
+	serv_ip := argsWithoutProg[0]
+	serv_port := argsWithoutProg[1]
+	db_ip := argsWithoutProg[2]
+	db_port := argsWithoutProg[3]
+	db_name := argsWithoutProg[4]
+	postgresURI := argsWithoutProg[5] + "@" + db_ip + ":" + db_port + "/" + db_name + "?sslmode=disable"
+
+	ipAndPort := "http://" + db_ip + ":" + db_port
 
 	println("Launching on " + ipAndPort)
 
-	db, err := sql.Open("postgres", db_str)
+	db, err := sql.Open("postgres", postgresURI)
 
 	env := &Env{db: db}
 	if err != nil {
@@ -89,7 +87,7 @@ func main() {
 		AllowHeaders: []string{"Origin"},
 	}))
 
-	router.Run("51.161.163.66:44658")
+	router.Run(serv_ip + ":" + serv_port)
 }
 
 /*
