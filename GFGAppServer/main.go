@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -13,9 +14,24 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const db_str = "postgresql://postgres:uv7MEyHry3q8v4yQFvpTNV5vgMBL5@51.161.163.66:48338/GFG_Prime?sslmode=disable"
+const db_str_production = "postgresql://postgres:uv7MEyHry3q8v4yQFvpTNV5vgMBL5@51.161.163.66:48338/GFG_Prime?sslmode=disable"
+const db_str_test = "postgresql://postgres:uv7MEyHry3q8v4yQFvpTNV5vgMBL5@51.161.163.66:48338/GFG_Test?sslmode=disable"
 
 func main() {
+	argsWithoutProg := os.Args[1:]
+
+	ip := argsWithoutProg[0]
+	port := argsWithoutProg[1]
+	ipAndPort := ip + ":" + port
+	test := argsWithoutProg[2] == "test"
+	db_str := db_str_production
+	if test {
+		db_str = db_str_test
+		println("Launching in test mod")
+	}
+
+	println("Launching on " + ipAndPort)
+
 	db, err := sql.Open("postgres", db_str)
 
 	env := &Env{db: db}
@@ -23,7 +39,7 @@ func main() {
 		println("Error opening database:" + err.Error())
 	}
 
-	indexHandler(db)
+	//indexHandler(db)
 
 	//Get all users from the database for the endpoints
 	rows, err := db.Query("SELECT username, pass_hash FROM users")
@@ -68,7 +84,7 @@ func main() {
 	router.Use(cors.Default())
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://51.161.163.66:44658"},
+		AllowOrigins: []string{ipAndPort},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin"},
 	}))
@@ -76,6 +92,7 @@ func main() {
 	router.Run("51.161.163.66:44658")
 }
 
+/*
 func indexHandler(db *sql.DB) {
 	var username string
 	var usernames []string
@@ -93,7 +110,7 @@ func indexHandler(db *sql.DB) {
 	for _, username := range usernames {
 		println(username)
 	}
-}
+} */
 
 func getAccounts(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, 1)
@@ -119,7 +136,7 @@ func (e *Env) accountUserEndpoint(c *gin.Context) {
 	var accountID int
 	err := e.db.QueryRow("SELECT account_id FROM users WHERE username = $1", req.Username).Scan(&accountID)
 	if err != nil {
-		println("Error querying database: " + err.Error())
+		println("[App Server - Get acc-id from DB] Error querying database: " + err.Error())
 		return
 	}
 
@@ -127,14 +144,14 @@ func (e *Env) accountUserEndpoint(c *gin.Context) {
 	var account Account
 	err = e.db.QueryRow("SELECT username, account_id FROM accounts WHERE account_id = $1", accountID).Scan(&account.Name, &account.ID)
 	if err != nil {
-		println("Error querying database: " + err.Error())
+		println("[App Server - Get account from DB] Error querying database: " + err.Error())
 		return
 	}
 
 	// Get the balance for the account
 	balance, err := e.getBalance(accountID)
 	if err != nil {
-		println("Error querying database: " + err.Error())
+		println("[App Server - Determine balance] Error querying database: " + err.Error())
 		return
 	}
 

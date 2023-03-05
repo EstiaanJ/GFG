@@ -14,7 +14,7 @@ $(document).ready(function() {
       success: function(data) {
         // Update account summary section
         $("#account-number").text(data.account_number);
-        $("#balance").text("$" + data.balance.toFixed(2));
+        $("#balance").text("℣" + data.balance.toFixed(3));
         $("#last-transaction").text(data.last_transaction);
         $("#username").text(username);
         
@@ -24,7 +24,7 @@ $(document).ready(function() {
           var row = $("<tr></tr>");
           row.append($("<td>" + transaction.date + "</td>"));
           row.append($("<td>" + transaction.description + "</td>"));
-          row.append($("<td>" + "$" + transaction.amount.toFixed(2) + "</td>"));
+          row.append($("<td>" + "℣" + transaction.amount.toFixed(3) + "</td>"));
           transactionTable.append(row);
         });
       },
