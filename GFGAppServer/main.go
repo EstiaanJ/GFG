@@ -12,6 +12,7 @@ import (
 //The Postgres URI and password that is leaked in the version history here has been changed
 
 func main() {
+
 	argsWithoutProg := os.Args[1:]
 
 	serv_ip := argsWithoutProg[0]
@@ -21,10 +22,10 @@ func main() {
 	db_name := argsWithoutProg[4]
 	postgresURI := argsWithoutProg[5] + "@" + db_ip + ":" + db_port + "/" + db_name + "?sslmode=disable"
 
-	ipAndPort := "http://" + db_ip + ":" + db_port
+	//ipAndPort := "http://" + db_ip + ":" + db_port
 
-	println("Launching on " + ipAndPort)
-	println("Postgres URI: " + "postgresURI")
+	println("Launching on " + serv_ip + ":" + serv_port)
+	println("Postgres URI: " + postgresURI)
 
 	db, err := sql.Open("postgres", postgresURI)
 
@@ -41,6 +42,8 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	go setup(router)
 
 	router.GET("/accounts", getAccounts)
 
@@ -89,9 +92,20 @@ type User struct {
 }
 
 type Account struct {
-	Name    string  `json:"name"`
-	ID      int     `json:"account_number"`
-	Balance float64 `json:"balance"`
+	Name         string        `json:"name"`
+	ID           int           `json:"account_number"`
+	Balance      float64       `json:"balance"`
+	Transactions []Transaction `json:"transactions"`
+}
+
+type Transaction struct {
+	Amount          float64 `json:"amount"`
+	Date            string  `json:"date"`
+	GameDate        string  `json:"game_date"`
+	Trans_id        string  `json:"trans_id"`
+	From_Account_id int     `json:"from_account_id"`
+	To_Account_id   int     `json:"to_account_id"`
+	Description     string  `json:"description"`
 }
 
 type AccountRequest struct {
@@ -107,6 +121,7 @@ type Transfer struct {
 	From_account_username string `json:"from_acc_name"`
 	To_account_username   string `json:"to_acc_username"`
 	Amount                string `json:"amount"`
+	Description           string `json:"description"`
 }
 
 // RAM stuff -----------------------------------------

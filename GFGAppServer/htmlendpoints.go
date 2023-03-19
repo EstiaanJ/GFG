@@ -49,6 +49,32 @@ func (e *Env) accountUserEndpoint(c *gin.Context) {
 		return
 	}
 
+	//Get Last 5 transactions
+	var transactions []Transaction
+	rows, err := e.db.Query("SELECT * FROM transactions WHERE from_account_id = $1 OR to_account_id = $1 ORDER BY date DESC LIMIT 5", accountID)
+	if err != nil {
+		println("[App Server - Get transactions from DB] Error querying database: " + err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var transaction Transaction
+		//
+		//Scan all 6 columns like this err = rows.Scan(&transaction.Amount, &transaction.Date, &transaction.GameDate)
+		//Amount          float64 `json:"amount"` Date            string  `json:"date"` GameDate        string  `json:"game_date"` Trans_id        int     `json:"trans_id"` From_Account_id int     `json:"from_account_id"` To_Account_id   int     `json:"to_account_id"`
+		//err = rows.Scan(&transaction.Amount, &transaction.Date, &transaction.GameDate, &transaction.Trans_id, &transaction.From_Account_id, &transaction.To_Account_id)
+		//Order of colums is trans_id, from_account_id, to_account_id, game_date, date, amount
+		err = rows.Scan(&transaction.Trans_id, &transaction.From_Account_id, &transaction.To_Account_id, &transaction.GameDate, &transaction.Date, &transaction.Amount, &transaction.Description)
+
+		if err != nil {
+			println("[App Server - Get transaction history from DB] Error scanning row: " + err.Error())
+			continue
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	account.Transactions = transactions
+
 	// Add the balance to the account object
 	account.Balance = balance
 
@@ -62,7 +88,7 @@ func (e *Env) transfer(c *gin.Context) {
 	var transfer Transfer //struct to hold the transfer information
 	if err := c.BindJSON(&transfer); err != nil {
 		//for debugging purposes print the whole json object to the console
-		println("Transfer JSON: " + transfer.From_account_username + " " + transfer.To_account_username + " " + transfer.Amount)
+		println("Transfer JSON: " + transfer.From_account_username + " " + transfer.To_account_username + " " + transfer.Amount + " " + transfer.Description)
 		println("Couldn't bind transfer")
 		return
 	}
@@ -112,7 +138,7 @@ func (e *Env) transfer(c *gin.Context) {
 	transfer_id := uuid.New()
 	from_account_id_str := strconv.Itoa(from_account_id)
 	to_account_id_str := strconv.Itoa(to_account_id)
-	_, err = e.db.Exec("INSERT INTO transactions (trans_id, amount, from_account_id, to_account_id, date) VALUES ($1, $2, $3, $4, $5)", transfer_id, transfer.Amount, from_account_id_str, to_account_id_str, time.Now().Format("2006-01-02 15:04:05"))
+	_, err = e.db.Exec("INSERT INTO transactions (trans_id, amount, from_account_id, to_account_id, date, game_date, description) VALUES ($1, $2, $3, $4, $5, $6, $7)", transfer_id, transfer.Amount, from_account_id_str, to_account_id_str, time.Now().Format("2006-01-02 15:04:05"), "33.123", transfer.Description)
 	if err != nil {
 		println("Error inserting transaction into database: " + err.Error())
 		return
@@ -126,43 +152,11 @@ func getAccounts(c *gin.Context) {
 }
 
 func (e *Env) getBalance(accountID int) (float64, error) {
-	// Query the database for all transactions related to the account
-	rows, err := e.db.Query("SELECT trans_id, amount, from_account_id, to_account_id FROM transactions WHERE from_account_id = $1 OR to_account_id = $1", accountID)
+	var balance float64
+	err := e.db.QueryRow("SELECT SUM(CASE WHEN from_account_id = $1 THEN -amount ELSE amount END) FROM transactions WHERE from_account_id = $1 OR to_account_id = $1", accountID).Scan(&balance)
 	if err != nil {
 		return 0, err
 	}
-	defer rows.Close()
-
-	var debitSum, creditSum float64
-
-	for rows.Next() {
-		var id string
-		var fromAccountID, toAccountID int
-		var amountStr string
-		if err := rows.Scan(&id, &amountStr, &fromAccountID, &toAccountID); err != nil {
-			return 0, err
-		}
-
-		amountFloat, err := strconv.ParseFloat(strings.Replace(amountStr, "$", "", -1), 64)
-		if err != nil {
-			return 0, err
-		}
-
-		if fromAccountID == accountID {
-			debitSum += amountFloat
-		}
-		if toAccountID == accountID {
-			creditSum += amountFloat
-		}
-	}
-
-	if err := rows.Err(); err != nil {
-		return 0, err
-	}
-
-	// Calculate the balance based on the debit and credit history
-	balance := creditSum - debitSum
-
 	return balance, nil
 }
 
