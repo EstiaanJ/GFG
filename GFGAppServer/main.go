@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
@@ -52,13 +53,13 @@ func main() {
 	router.POST("/transfer", env.transfer)
 	router.POST("/accounts", postAccount)
 
-	//router.Use(cors.Default())
+	router.Use(cors.Default())
 
-	/*router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{ipAndPort},
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"51.161.163.66", "localhost", "0.0.0.0", "127.0.0.1", "51.161.163.66:44658", "51.161.163.66:48338"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin"},
-	}))*/
+	}))
 
 	router.Run(serv_ip + ":" + serv_port)
 }
