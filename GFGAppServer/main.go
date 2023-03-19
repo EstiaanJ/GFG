@@ -56,7 +56,7 @@ func main() {
 	router.Use(cors.Default())
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"51.161.163.66", "localhost", "0.0.0.0", "127.0.0.1", "51.161.163.66:44658", "51.161.163.66:48338"},
+		AllowOrigins: []string{"http://51.161.163.66", "http://localhost", "http://0.0.0.0", "http://127.0.0.1", "https://51.161.163.66"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin"},
 	}))
